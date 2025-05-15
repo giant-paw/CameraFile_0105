@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'package:materi_camera/camera_page.dart';
 import 'package:materi_camera/storage_helper.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -35,8 +36,47 @@ class _HomePageNonblocState extends State<HomePageNonbloc> {
     }
   }
 
+  Future<void> _pickFromGallery() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      final saved = await StorageHelper.saveImage(File(picked.path), 'gallery');
+      setState(() => _imageFile = saved);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Disalin: ${saved.path}')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(title: const Text('Beranda')),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                 child: ElevatedButton.icon(
+                    icon: const Icon(Icons.camera),
+                    label: const Text('Ambil Foto'),
+                    onPressed: _takePicture
+                  ), 
+                ),
+
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.folder),
+                  label: const Text('Pilih dari Galeri'),
+                  onPressed: _pickFromGallery, 
+                ), 
+              ],
+            ),
+            
+          ],
+        ) 
+      ),
+    );
   }
 }
