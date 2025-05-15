@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:materi_camera/bloc/camera_bloc.dart';
 import 'package:materi_camera/bloc/camera_event.dart';
 import 'package:materi_camera/bloc/camera_state.dart';
@@ -48,8 +49,32 @@ class _BlocCameraPageState extends State<BlocCameraPage> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      
+      backgroundColor: Colors.black,
+      body: BlocBuilder<CameraBloc, CameraState>(
+        builder:  (context, state) {
+          if (state is! CameraReady) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  GestureDetector(
+                    onTapDown: (details) {
+                      context.read<CameraBloc>().add(
+                        TapToFocus(details.localPosition, constraints.biggest),
+                      );
+                    },
+                    child: CameraPreview(state.controller),
+                  ),
+                ],
+              );
+            }
+          );
+        }
+      )
     );
   }
-  
 }
