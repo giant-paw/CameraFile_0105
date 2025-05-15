@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:materi_camera/bloc/camera_event.dart';
 import 'package:materi_camera/bloc/camera_state.dart';
+import 'package:materi_camera/bloc_storage_helper.dart';
 import 'package:materi_camera/camera_page.dart';
 import 'package:meta/meta.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -111,7 +112,7 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     );
 
     if (file != null) {
-      final saved = await StorageHelperBl.saveImage(file, 'camera');
+      final saved = await BlocStorageHelper.saveImage(file, 'camera');
       emit((state as CameraReady).copyWith(
         imageFile: saved,
         snackBarMessage: 'Disimpan ${saved.path}'
