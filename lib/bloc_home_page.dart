@@ -1,0 +1,61 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:materi_camera/bloc/camera_bloc.dart';
+import 'package:materi_camera/bloc/camera_event.dart';
+import 'package:materi_camera/bloc/camera_state.dart';
+
+class BlocHomePage extends StatelessWidget {
+  const BlocHomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Beranda')),
+      body: SafeArea(
+        child: BlocConsumer<CameraBloc, CameraState>(
+          listener: (context, state) {
+            if (state is CameraReady && state.snackBarMessage != null) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.snackBarMessage!)));
+              context.read<CameraBloc>().add(ClearSnackbar());
+            }
+          },
+          builder: (context, state) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.camera),
+                        label: const Text('Ambil Foto'),
+                        onPressed: () {
+                          final bloc = context.read<CameraBloc>();
+                          if (bloc.state is! CameraReady) {
+                            bloc.add(InitializeCamera());
+                          }
+                          bloc.add(OpenCameraAndCapture(context));
+                        },
+                      ),
+                    ),
+
+                    ElevatedButton.icon(
+                      icon: Icon (Icons.folder),
+                      label: const Text('Pilih dari Galeri'),
+                      onPressed: () => context
+                          .read<CameraBloc>()
+                          .add(PickImageFromGallery()),
+                    ), 
+                  ],
+                )
+              ],
+            );
+          }
+        )
+      ),
+    );
+  }
+}
